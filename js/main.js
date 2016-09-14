@@ -1,9 +1,11 @@
 var currentMood;
 var currentAge;
+var currentAgeYears;
 var currentGender;
 var currentTime;
 var currentMenu;
 var currentToy;
+var currTime;
 // Get elements from DOM
 var pageheader = $("#page-header")[0]; //note the [0], jQuery returns an object, so to get the html DOM object we need the first item in the object
 var pageheader2 = $("#page-header2")[0];
@@ -26,6 +28,11 @@ imgSelector.addEventListener("change", function () {
             currentGender = getCurrGender(faceAttributes);
             currentTime = getTime();
             currentMenu = getMenu();
+            function clock() {
+                var now = new Date();
+                currTime = now.getHours() + '.' + now.getMinutes();
+            }
+            clock();
             changeUI();
         });
     });
@@ -58,20 +65,41 @@ function changeUI() {
     else {
         pageheader.innerHTML = "";
     }
-    pageheader2.innerHTML = "You are an: " + currentAge.name;
-    pageheader3.innerHTML = "You are: " + currentGender.name;
-    pageheader4.innerHTML = "Menu: " + currentMenu.name;
+    pageheader4.innerHTML = currentMenu.name;
     //var imgAge : HTMLImageElement = <HTMLImageElement>  $("#selected-img")[0];
     var imgMenu = $("#selected-img-menu")[0];
     var imgToy = $("#selected-img-toy")[0];
     imgMenu.style.display = "block"; //just some formating of the menu's location
     if (currentToy != null) {
         imgToy.style.display = "block";
+        imgToy.src = currentToy.view;
+        currentToy = null;
+    }
+    else {
+        imgToy.style.display = "none";
     }
     imgMenu.src = currentMenu.view;
-    imgToy.src = currentToy.view;
     //Remove offset at the top
     pagecontainer.style.marginTop = "20px";
+    var orderNumber = Math.floor((Math.random() * 100) + 1);
+    imgMenu.onclick = function () {
+        imgToy.style.display = "none";
+        imgMenu.style.display = "none";
+        pageheader2.style.display = "none";
+        pageheader4.style.display = "none";
+        pageheader.innerHTML = "Your order has been placed. <br> Your order number is " + orderNumber;
+        //Change message after 4 seconds
+        //var delay=3000;
+        setTimeout(function () {
+            pagecontainer.style.marginTop = "150px";
+            pageheader.innerHTML = "Enjoy you meal!";
+        }, 3000);
+        setTimeout(function () {
+            pageheader.innerHTML = "Order your meal using face recognition.";
+        }, 5000);
+    };
+    pageheader2.innerHTML = currTime + "Our analysis shows that your mood is " + currentMood.name +
+        ",<br>You are " + currentAgeYears + " years old,<br> and you are " + currentGender.name + ".";
 }
 // Face API call
 function sendFaceRequest(file, callback) {
@@ -186,7 +214,7 @@ var Toy = (function () {
     return Toy;
 }());
 var happy = new Mood("happy", "http://emojipedia-us.s3.amazonaws.com/cache/a0/38/a038e6d3f342253c5ea3c057fe37b41f.png");
-var sad = new Mood("sad", "You seem sad :( Cheer yourself up with some dessert!");
+var sad = new Mood("sad", "You seem sad  <img width='30px' src='https://cdn.shopify.com/s/files/1/1061/1924/files/Sad_Face_Emoji.png?9898922749706957214'/>  Cheer yourself up with some dessert!");
 var angry = new Mood("angry", "https://cdn.shopify.com/s/files/1/1061/1924/files/Very_Angry_Emoji.png?9898922749706957214");
 var neutral = new Mood("neutral", "https://cdn.shopify.com/s/files/1/1061/1924/files/Neutral_Face_Emoji.png?9898922749706957214");
 var male = new Gender("male", "images/menu/boy.png");
@@ -195,10 +223,10 @@ var child = new Age("child", "images/menu/kids.png");
 var adult = new Age("adult", "images/menu/burger.png");
 var morning = new Time("morning", "images/menu/breakfast.png");
 var day = new Time("day", "images/menu/burger.png");
-var breakfast = new Menu("breakfast", "images/menu/breakfast.png");
-var burger = new Menu("burger", "images/menu/burger.png");
-var dessert = new Menu("dessert", "images/menu/dessert.png");
-var kids = new Menu("kids", "images/menu/kids.png");
+var breakfast = new Menu("Breakfast Menu", "images/menu/breakfast.png");
+var burger = new Menu("Burger Menu", "images/menu/burger.png");
+var dessert = new Menu("Dessert Menu", "images/menu/dessert.png");
+var kids = new Menu("Kids Menu", "images/menu/kids.png");
 var boy = new Toy("boy", "images/menu/boy.png");
 var girl = new Toy("girl", "images/menu/girl.png");
 // any type as the scores values is from the project oxford api request (so we dont know the type)
@@ -225,6 +253,7 @@ function getCurrAge(faceAttributes) {
     else {
         currentAge = child;
     }
+    currentAgeYears = Math.round(faceAttributes.age);
     return currentAge;
 }
 function getCurrGender(faceAttributes) {
@@ -237,9 +266,9 @@ function getCurrGender(faceAttributes) {
     return currentGender;
 }
 function getTime() {
-    var t;
-    t = 13;
-    if (t > 5.5 && t < 10.5) {
+    var t = parseFloat(currTime);
+    //if (t > 5.5 && t < 10.5) {
+    if (t > 1.30 && t < 2.02) {
         currentTime = morning;
     }
     else {

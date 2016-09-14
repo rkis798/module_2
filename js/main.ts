@@ -1,10 +1,11 @@
 var currentMood: Mood;
 var currentAge: Age;
+var currentAgeYears: number;
 var currentGender: Gender;
-
 var currentTime: Time;
 var currentMenu: Menu;
 var currentToy: Toy;
+var currTime: string;
 
 // Get elements from DOM
 var pageheader = $("#page-header")[0]; //note the [0], jQuery returns an object, so to get the html DOM object we need the first item in the object
@@ -31,6 +32,12 @@ imgSelector.addEventListener("change", function () { // file has been picked
             currentGender = getCurrGender(faceAttributes);
             currentTime = getTime();
             currentMenu = getMenu();
+
+            function clock() {
+                var now = new Date();
+                currTime = now.getHours()+'.'+now.getMinutes();
+            }
+            clock();
             
             changeUI();
         });
@@ -63,25 +70,45 @@ function changeUI() : void {
     } else {
         pageheader.innerHTML= "";
     }
-    
-    pageheader2.innerHTML = "You are an: " + currentAge.name;
-    pageheader3.innerHTML = "You are: " + currentGender.name;
-    pageheader4.innerHTML = "Menu: " + currentMenu.name;
+    pageheader4.innerHTML = currentMenu.name;
 
     //var imgAge : HTMLImageElement = <HTMLImageElement>  $("#selected-img")[0];
     var imgMenu : HTMLImageElement = <HTMLImageElement>  $("#selected-img-menu")[0];
     var imgToy : HTMLImageElement = <HTMLImageElement>  $("#selected-img-toy")[0];
 
-
     imgMenu.style.display = "block"; //just some formating of the menu's location
     if (currentToy != null) {
         imgToy.style.display = "block";
+        imgToy.src = currentToy.view;
+        currentToy = null;
+    } else {
+        imgToy.style.display = "none";
     }
-    imgMenu.src = currentMenu.view;
-    imgToy.src = currentToy.view;
 
+    imgMenu.src = currentMenu.view;
     //Remove offset at the top
     pagecontainer.style.marginTop = "20px";
+
+    var orderNumber: number = Math.floor((Math.random() * 100) + 1); 
+    imgMenu.onclick = function(){
+        imgToy.style.display = "none";
+        imgMenu.style.display = "none";
+        pageheader2.style.display = "none";
+        pageheader4.style.display = "none";
+        pageheader.innerHTML = "Your order has been placed. <br> Your order number is " + orderNumber;  
+        //Change message after 4 seconds
+        //var delay=3000;
+        setTimeout(function() {
+            pagecontainer.style.marginTop = "150px";
+            pageheader.innerHTML = "Enjoy you meal!";
+        }, 3000);
+        setTimeout(function() {
+            pageheader.innerHTML = "Order your meal using face recognition.";
+        }, 5000);
+    };
+
+    pageheader2.innerHTML = currTime + "Our analysis shows that your mood is " + currentMood.name +
+                            ",<br>You are " + currentAgeYears + " years old,<br> and you are " + currentGender.name + ".";
 }
 
 // Face API call
@@ -198,7 +225,7 @@ class Toy {
 }
 
 var happy : Mood = new Mood("happy", "http://emojipedia-us.s3.amazonaws.com/cache/a0/38/a038e6d3f342253c5ea3c057fe37b41f.png");
-var sad : Mood  = new Mood("sad", "You seem sad :( Cheer yourself up with some dessert!");
+var sad : Mood  = new Mood("sad", "You seem sad  <img width='30px' src='https://cdn.shopify.com/s/files/1/1061/1924/files/Sad_Face_Emoji.png?9898922749706957214'/>  Cheer yourself up with some dessert!");
 var angry : Mood = new Mood("angry", "https://cdn.shopify.com/s/files/1/1061/1924/files/Very_Angry_Emoji.png?9898922749706957214");
 var neutral : Mood  = new Mood("neutral", "https://cdn.shopify.com/s/files/1/1061/1924/files/Neutral_Face_Emoji.png?9898922749706957214");
 
@@ -211,10 +238,10 @@ var adult : Age = new Age("adult", "images/menu/burger.png");
 var morning : Time = new Time("morning", "images/menu/breakfast.png");
 var day : Time = new Time("day", "images/menu/burger.png");
 
-var breakfast : Menu = new Menu("breakfast", "images/menu/breakfast.png");
-var burger : Menu = new Menu("burger", "images/menu/burger.png");
-var dessert : Menu = new Menu("dessert", "images/menu/dessert.png");
-var kids : Menu = new Menu("kids", "images/menu/kids.png");
+var breakfast : Menu = new Menu("Breakfast Menu", "images/menu/breakfast.png");
+var burger : Menu = new Menu("Burger Menu", "images/menu/burger.png");
+var dessert : Menu = new Menu("Dessert Menu", "images/menu/dessert.png");
+var kids : Menu = new Menu("Kids Menu", "images/menu/kids.png");
 
 var boy : Toy = new Toy("boy", "images/menu/boy.png");
 var girl : Toy = new Toy("girl", "images/menu/girl.png");
@@ -240,6 +267,7 @@ function getCurrAge(faceAttributes : any) : Age {
     }else{
         currentAge = child;
     }
+    currentAgeYears = Math.round(faceAttributes.age);
     return currentAge;
 }
 
@@ -253,9 +281,9 @@ function getCurrGender(faceAttributes : any) : Gender {
 }
 
 function getTime () : any {
-    var t : number;
-    t = 13;
-    if (t > 5.5 && t < 10.5) {
+    var t :number = parseFloat(currTime);
+    //if (t > 5.5 && t < 10.5) {
+    if (t > 1.30 && t < 2.02) {
         currentTime = morning;
     } else {
         currentTime = day;
