@@ -15,7 +15,6 @@ var pagecontainer = $("#page-container")[0];
 
 // The html DOM object has been casted to a input element (as defined in index.html) as later we want to get specific fields that are only avaliable from an input element object
 var imgSelector : HTMLInputElement = <HTMLInputElement> $("#my-file-selector")[0]; 
-var refreshbtn = $("#refreshbtn")[0]; //You dont have to use [0], however this just means whenever you use the object you need to refer to it with [0].
 
 // Register button listeners
 imgSelector.addEventListener("change", function () { // file has been picked
@@ -38,12 +37,6 @@ imgSelector.addEventListener("change", function () { // file has been picked
     });
 });
 
-refreshbtn.addEventListener("click", function () {
-    // TODO: Load random song based on mood
-    // Load random song based on mood
-
-});
-
 function processImage(callback) : void {
     var file = imgSelector.files[0];  //get(0) is required as imgSelector is a jQuery object so to get the DOM object, its the first item in the object. files[0] refers to the location of the photo we just chose.
     var reader = new FileReader();
@@ -61,18 +54,19 @@ function processImage(callback) : void {
             callback(file);
         }
     }
-
 }
 
 function changeUI() : void {
     //Show detected mood
-    pageheader.innerHTML = "Your mood is: " + currentMood.name;  //Remember currentMood is a Mood object, which has a name and emoji linked to it. 
+    if (currentMood.name == "sad") {
+        pageheader.innerHTML = currentMood.message; 
+    } else {
+        pageheader.innerHTML= "";
+    }
     
     pageheader2.innerHTML = "You are an: " + currentAge.name;
     pageheader3.innerHTML = "You are: " + currentGender.name;
     pageheader4.innerHTML = "Menu: " + currentMenu.name;
-
-    //Show mood emoji
 
     //var imgAge : HTMLImageElement = <HTMLImageElement>  $("#selected-img")[0];
     var imgMenu : HTMLImageElement = <HTMLImageElement>  $("#selected-img-menu")[0];
@@ -86,9 +80,6 @@ function changeUI() : void {
     imgMenu.src = currentMenu.view;
     imgToy.src = currentToy.view;
 
-
-    //Display song refresh button
-    refreshbtn.style.display = "inline";
     //Remove offset at the top
     pagecontainer.style.marginTop = "20px";
 }
@@ -112,11 +103,11 @@ function sendFaceRequest(file, callback) : void {
                 var faceAttributes = data[0].faceAttributes;
                 callback(faceAttributes);
             } else {
-                pageheader.innerHTML = "Hmm, we can't detect a human face in that photo. Try another?";
+                pageheader.innerHTML = "Hmm, we can't detect a human face in that photo. Please try another?";
             }
         })
         .fail(function (error) {
-            pageheader.innerHTML = "Sorry, something went wrong. :( Try again in a bit?";
+            pageheader.innerHTML = "Sorry, something went wrong. Please try again later.";
             console.log(error.getAllResponseHeaders());
         });
 }
@@ -140,11 +131,11 @@ function sendEmotionRequest(file, callback) : void {
                 var scores = data[0].scores;
                 callback(scores);
             } else {
-                pageheader.innerHTML = "Hmm, we can't detect a human face in that photo. Try another?";
+                pageheader.innerHTML = "Hmm, we can't detect a human face in that photo. Please try another?";
             }
         })
         .fail(function (error) {
-            pageheader.innerHTML = "Sorry, something went wrong. :( Try again in a bit?";
+            pageheader.innerHTML = "Sorry, something went wrong. Please try again later.";
             console.log(error.getAllResponseHeaders());
         });
 }
@@ -154,10 +145,10 @@ function sendEmotionRequest(file, callback) : void {
 //A Mood class which has the mood as a string and its corresponding emoji
 class Mood {
     name: string;
-    emoji: string;
-    constructor(public mood, public emojiurl) {
+    message: string;
+    constructor(public mood, public sentence) {
         this.name = mood;
-        this.emoji = emojiurl;
+        this.message = sentence;
     }
 }
 
@@ -207,7 +198,7 @@ class Toy {
 }
 
 var happy : Mood = new Mood("happy", "http://emojipedia-us.s3.amazonaws.com/cache/a0/38/a038e6d3f342253c5ea3c057fe37b41f.png");
-var sad : Mood  = new Mood("sad", "images/menu/dessert.png");
+var sad : Mood  = new Mood("sad", "You seem sad :( Cheer yourself up with some dessert!");
 var angry : Mood = new Mood("angry", "https://cdn.shopify.com/s/files/1/1061/1924/files/Very_Angry_Emoji.png?9898922749706957214");
 var neutral : Mood  = new Mood("neutral", "https://cdn.shopify.com/s/files/1/1061/1924/files/Neutral_Face_Emoji.png?9898922749706957214");
 
@@ -291,51 +282,3 @@ function getMenu () {
     }
     return currentMenu;
 }
-
-/*
-//A Playlist class which holds various amount of songs for each different mood
-class Playlist {
-    happy: Song[];
-    sad: Song[];
-    angry: Song[];
-
-    constructor() {
-        this.happy = [];
-        this.sad = [];
-        this.angry = [];
-    }
-
-    addSong(mood : string, song : Song) : void {
-        // depending on the mood we want to add it to its corresponding list in our playlist
-        if (mood === "happy") {
-            this.happy.push(song); // this means the value of happy of the playlist object that got invoked the method "addSong"
-        } else if (mood === "sad") {
-            this.sad.push(song);
-        } else if (mood === "angry") {
-            this.angry.push(song);
-        } // do a default one as well
-    }
-
-    getRandSong(mood : string) : Song {
-        if (mood === "happy" || mood === "neutral") { // we have happy and neutral as getting songs from happy
-            return this.happy[Math.floor(Math.random() * this.happy.length)];
-        } else if (mood === "sad") {
-            return this.sad[Math.floor(Math.random() * this.sad.length)];
-        } else if (mood === "angry") {
-            return this.angry[Math.floor(Math.random() * this.angry.length)];
-        } 
-    }
-}
-
-var myPlaylist : Playlist;
-
-
-function loadSong(currentMood : Mood) : void {
-    var songSelected : Song = myPlaylist.getRandSong(currentMood.name); // gets a random song based on the moodd
-    var track_url : string = songSelected.url; 
-
-    $("#track-name")[0].innerHTML = "Have a listen to: " + songSelected.title; // display the song being played
-    $("#track-name")[0].style.display = "block"; // changing this style to block makes it appear (before was set to none so it wasnt seen)
-    $("#musicplayer")[0].style.display = "block";
-}
-*/
