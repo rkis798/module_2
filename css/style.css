@@ -92,7 +92,6 @@ body #page-container {
     transition: margin-top 1s;
     min-height: 100%;
     margin-bottom: -100px;
-    position: relative;
 }
 
 .btn-wrapper {
