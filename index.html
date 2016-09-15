@@ -8,13 +8,24 @@
         <link rel="stylesheet" type="text/css" href="./css/style.css">
 
     </head>
-    <body onload="clock();">
+    <body>
         <div class="container" id="page-container">
-            <h1 id="app-name">
-                <img style="width:150px;margin:0 auto;" src="http://diylogodesigns.com/blog/wp-content/uploads/2016/04/Mcdonalds-logo-icon-png-free.png"/>McDonald's Order System
-            </h1>
+            <span class="glyphicon glyphicon-info-sign" id="info">
+                <span id="infoBox">
+                    <b>How it works?</b>
+                    <br>
+                    This is a demonstration of a ordering system based on McDonald's which utilises face recognition 
+                    software to improve the your ordering experience.
+                    <br>
+                    Once you upload a photo of yourself, we get to work analysing that photo to determine your mood,
+                    age and gender. The outcome is a customised menu to help you decide on what to order.
+                </span>
+            </span>
+            <a href="" id="home"><h1 id="app-name">
+                <img style="width:100px;margin:0 auto;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald's_Golden_Arches.svg/2000px-McDonald's_Golden_Arches.svg.png"/> McDonald's Order System
+            </h1></a>
 
-            <h2 id="page-header">
+            <h2 id="page-header" onload="clock();">
                 Order your meal using face recognition.
             </h2>
             <h2 id="page-header3"></h2>
@@ -23,14 +34,18 @@
             <img id="selected-img-toy" src="">
             <h2 id="page-header2"></h2>
 
-            <div class="btn-wrapper">
+            <div class="btn-wrapper" id="mainButton">
                 <label class="btn btn-primary" for="my-file-selector">
                     <input id="my-file-selector" type="file">
                     Upload a picture of you
                 </label>
             </div>
-
         </div>
+
+        <p id="footer">
+            &#169; Rayneel Kishore 2016.
+            McDonald's name and logo only used for demonstration purposes. Logo is a file from the <a href="https://en.wikipedia.org/wiki/File:McDonald%27s_Golden_Arches.svg">Wikimedia Commons</a>
+        </p> 
 
         <!--jQuery Script-->
         <script src="./node_modules/jquery/dist/jquery.min.js"></script>

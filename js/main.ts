@@ -13,13 +13,14 @@ var pageheader2 = $("#page-header2")[0];
 var pageheader3 = $("#page-header3")[0];
 var pageheader4 = $("#page-header4")[0];
 var pagecontainer = $("#page-container")[0]; 
+var mainButton = $("#mainButton")[0];
 
 // The html DOM object has been casted to a input element (as defined in index.html) as later we want to get specific fields that are only avaliable from an input element object
 var imgSelector : HTMLInputElement = <HTMLInputElement> $("#my-file-selector")[0]; 
 
 // Register button listeners
 imgSelector.addEventListener("change", function () { // file has been picked
-    pageheader.innerHTML = "Just a sec while we analyse your mood...";
+    pageheader.innerHTML = "Just a sec while we analyse you...";
     processImage(function (file) { //this checks the extension and file
         // Get emotions based on image
         sendEmotionRequest(file, function (emotionScores) { //here we send the API request and get the response
@@ -35,7 +36,7 @@ imgSelector.addEventListener("change", function () { // file has been picked
 
             function clock() {
                 var now = new Date();
-                currTime = now.getHours()+'.'+now.getMinutes();
+                currTime = now.getHours()+'.'+("0" +  now.getMinutes()).slice(-2);
             }
             clock();
             
@@ -65,12 +66,12 @@ function processImage(callback) : void {
 
 function changeUI() : void {
     //Show detected mood
-    if (currentMood.name == "sad") {
+    if (currentTime != morning && currentMood.name == "sad") {
         pageheader.innerHTML = currentMood.message; 
     } else {
         pageheader.innerHTML= "";
     }
-    pageheader4.innerHTML = currentMenu.name;
+
 
     //var imgAge : HTMLImageElement = <HTMLImageElement>  $("#selected-img")[0];
     var imgMenu : HTMLImageElement = <HTMLImageElement>  $("#selected-img-menu")[0];
@@ -84,10 +85,12 @@ function changeUI() : void {
     } else {
         imgToy.style.display = "none";
     }
-
+    pageheader4.innerHTML = currentMenu.name + ": click on an item below to order";
     imgMenu.src = currentMenu.view;
+    
     //Remove offset at the top
     pagecontainer.style.marginTop = "20px";
+    mainButton.style.display = "none";
 
     var orderNumber: number = Math.floor((Math.random() * 100) + 1); 
     imgMenu.onclick = function(){
@@ -95,19 +98,19 @@ function changeUI() : void {
         imgMenu.style.display = "none";
         pageheader2.style.display = "none";
         pageheader4.style.display = "none";
-        pageheader.innerHTML = "Your order has been placed. <br> Your order number is " + orderNumber;  
-        //Change message after 4 seconds
-        //var delay=3000;
+        pageheader.innerHTML = "Your order has been placed<br><br> Your order number is " + orderNumber;  
+        
+        //Change message after 3 seconds
         setTimeout(function() {
             pagecontainer.style.marginTop = "150px";
-            pageheader.innerHTML = "Enjoy you meal!";
+            pageheader.innerHTML = "Enjoy your meal!";
         }, 3000);
+        //Reload page after 2 seconds
         setTimeout(function() {
-            pageheader.innerHTML = "Order your meal using face recognition.";
+            location.reload();
         }, 5000);
     };
-
-    pageheader2.innerHTML = currTime + "Our analysis shows that your mood is " + currentMood.name +
+    pageheader2.innerHTML = "Our analysis shows that your mood is " + currentMood.name +
                             ",<br>You are " + currentAgeYears + " years old,<br> and you are " + currentGender.name + ".";
 }
 
@@ -281,9 +284,9 @@ function getCurrGender(faceAttributes : any) : Gender {
 }
 
 function getTime () : any {
-    var t :number = parseFloat(currTime);
+    var t : number = parseFloat(currTime);
     //if (t > 5.5 && t < 10.5) {
-    if (t > 1.30 && t < 2.02) {
+    if (t < 10.31 && t > 5.30) {
         currentTime = morning;
     } else {
         currentTime = day;
