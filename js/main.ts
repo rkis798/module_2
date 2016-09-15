@@ -14,6 +14,7 @@ var pageheader3 = $("#page-header3")[0];
 var pageheader4 = $("#page-header4")[0];
 var pagecontainer = $("#page-container")[0]; 
 var mainButton = $("#mainButton")[0];
+var footer = $("#footer")[0];
 
 // The html DOM object has been casted to a input element (as defined in index.html) as later we want to get specific fields that are only avaliable from an input element object
 var imgSelector : HTMLInputElement = <HTMLInputElement> $("#my-file-selector")[0]; 
@@ -112,6 +113,7 @@ function changeUI() : void {
     };
     pageheader2.innerHTML = "Our analysis shows that your mood is " + currentMood.name +
                             ",<br>You are " + currentAgeYears + " years old,<br> and you are " + currentGender.name + ".";
+    footer.style.position = "relative";
 }
 
 // Face API call
