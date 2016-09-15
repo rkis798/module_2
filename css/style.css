@@ -91,7 +91,7 @@ body #page-container {
     -webkit-transition: margin-top 1s; /* Safari */
     transition: margin-top 1s;
     min-height: 100%;
-    margin-bottom: -100px;
+    margin-bottom: 50px;
 }
 
 .btn-wrapper {
